@@ -2,8 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const NodeCouchDb =require('node-couchdb');
-const PouchDB = require('pouchdb');
-PouchDB.plugin(require('pouchdb-find'));
 
 const couch = new NodeCouchDb({
   auth:{
@@ -13,7 +11,6 @@ const couch = new NodeCouchDb({
 });
 
 const dbName = 'scheduledsending';
-var db = new PouchDB('scheduledsending');
 const viewUrl = '_design/all_sheduledsending/_view/all';
 
 couch.listDatabases().then(function(dbs){

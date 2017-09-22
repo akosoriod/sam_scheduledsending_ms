@@ -4,7 +4,7 @@
   "description": "microservice sheduled sending",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,8 +12,6 @@
     "body-parser": "^1.18.1",
     "ejs": "^2.5.7",
     "express": "^4.15.4",
-    "node-couchdb": "^1.2.0",
-    "pouchdb": "^6.3.4",
-    "pouchdb-find": "^6.3.4"
+    "node-couchdb": "^1.2.0"
   }
 }
