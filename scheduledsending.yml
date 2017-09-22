@@ -1,0 +1,173 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Scheduledsending Microservice
+  description: nodeJS + CouchDB
+  contact:
+    name: Anderson Kavir Osorio Delgado
+    email: akosoriod@unal.edu.co
+  license:
+    name: Software Architecture 2017-II
+host: '192.168.99.101:3006'
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /:
+    get:
+      summary: Returns all sheduled sendigs
+      operationId: getAllScheduledsending
+      parameters:
+        - name: firstResult
+          in: query
+          description: The first result to return
+          required: false
+          type: integer
+        - name: maxResult
+          in: query
+          description: The maximum number of results to return
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/ScheduledsendingList'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/add':
+    post:
+      summary: Creates a Scheduled ending to Sent
+      operationId: createScheduledsending
+      parameters:
+        - name: mail
+          in: body
+          required: true
+          description: Scheduled sending Object
+          schema:
+            $ref: '#/definitions/Scheduledsending'
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/update/{id}':
+    put:
+      summary: Updates a scheduled sending with the given id
+      operationId: updateScheduledsending
+      parameters:
+        - name: id
+          in: path
+          description: The id of the scheduledsending to be updated
+          required: true
+          type: string
+        - name: scheduledsending
+          in: body
+          required: true
+          description: Mail Sent Object
+          schema:
+            $ref: '#/definitions/Scheduledsending'
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/delete/{id}':
+    delete:
+      summary: Deletes a scheduled sending with the given id
+      operationId: deleteScheduledsending
+      parameters:
+        - name: id
+          in: path
+          description: The id of the Scheduleds ending to be deleted
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '406':
+          description: Not Acceptable (Invalid Params)
+          schema:
+            $ref: '#/definitions/ErrorModel'
+        '500':
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/ErrorModel'
+definitions:
+  Scheduledsending:
+    type: object
+    properties:
+      id_mail:
+        type: number
+      date:
+        type: array
+        items:
+          $ref: '#/definitions/date'
+
+  ScheduledsendingList:
+    type: object
+    required:
+      - total
+      - list
+    properties:
+      total:
+        type: number
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/Scheduledsending'
+  ErrorModel:
+    type: object
+    required:
+      - message
+      - code
+    properties:
+      message:
+        type: string
+      code:
+        type: number
+      description:
+        type: object
+  date:
+    type: object
+    properties:
+      year:
+        type: number
+      month:
+        type: number
+      day:
+        type: number
+      hour:
+        type: number
+      minutes:
+        type: number
