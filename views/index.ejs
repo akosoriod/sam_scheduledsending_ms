@@ -1,21 +1,10 @@
-<h3>Add scheduledsending</h3>
-<form method="post" action="/scheduledsending/add">
-  <input type="text" name="id_mail" placeholder="add Id Mail" >
-  <input type="text" name="date.year" placeholder="add year">
-  <input type="text" name="date.month" placeholder="add month">
-  <input type="text" name="date.day" placeholder="add day">
-  <input type="text" name="date.hour" placeholder="add hour">
-  <input type="text" name="date.minutes" placeholder="add minutes">
-  <input type="submit" value="submit" >
-</form>
 <h3>Time <%= new Date();%>
 </h3>
 <h3>ScheduledSending</h3>
 <table style="width:65%">
   <tr>
-    <th style="text-align: center" >id_doc</th>
-    <th style="text-align: center" >rev_doc</th>
-    <th style="text-align: center" >id_mail</th>
+    <th style="text-align: center" >user_id</th>
+    <th style="text-align: center" >mail_id</th>
     <th style="text-align: center" >Year</th>
     <th style="text-align: center" >Month</th>
     <th style="text-align: center" > Day </th>
@@ -24,9 +13,8 @@
   </tr>
   <% scheduledsending.forEach(function(scheduledsending){ %>
     <tr >
-      <td style="text-align: center"> <%= scheduledsending.id %> </td>
-      <td style="text-align: center"> <%= scheduledsending.value.rev %> </td>
-      <td style="text-align: center"> <%= scheduledsending.value.id_mail %> </td>
+      <td style="text-align: center"> <%= scheduledsending.value.user_id %> </td>
+      <td style="text-align: center"> <%= scheduledsending.value.mail_id %> </td>
       <td style="text-align: center"> <%= scheduledsending.value.date.year %> </td>
       <td style="text-align: center"> <%= scheduledsending.value.date.month %> </td>
       <td style="text-align: center"> <%= scheduledsending.value.date.day %> </td>
@@ -35,3 +23,4 @@
   </tr>
   <% }); %>
   </table>
+  <script src="pouchdb-6.3.4.min.js"></script>

@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const NodeCouchDb =require('node-couchdb');
+const PouchDB = require('pouchdb');
+PouchDB.plugin(require('pouchdb-find'));
 
 const couch = new NodeCouchDb({
   auth:{
@@ -11,6 +13,7 @@ const couch = new NodeCouchDb({
 });
 
 const dbName = 'scheduledsending';
+var db = new PouchDB('scheduledsending');
 const viewUrl = '_design/all_sheduledsending/_view/all';
 
 couch.listDatabases().then(function(dbs){
@@ -25,6 +28,10 @@ app.set('views', path.join(__dirname,'views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
 
+app.listen(3006, function(){
+  console.log('Server Started On Port 3006');
+});
+
 app.get('/', function (req, res){
     couch.get(dbName, viewUrl).then(
       function(data, headers, status){
@@ -36,20 +43,29 @@ app.get('/', function (req, res){
       res.send(err);
     });
 });
-
+app.get('/scheduledsending/all', function (req, res){
+    couch.get(dbName, viewUrl).then(
+      function(data, headers, status){
+        res.send(data.data.rows);
+      },
+    function(err){
+      res.send(err);
+    });
+});
 app.post('/scheduledsending/add', function (req, res){
-    const id_mail = req.body.id_mail;
+    const user_id = req.body.user_id;
+    const mail_id = req.body.mail_id;
     const year = req.body.date.year;
     const month = req.body.date.month;
     const day = req.body.date.day;
     const hour = req.body.date.hour;
     const minutes = req.body.date.minutes;
-
     couch.uniqid().then(function(ids){
       const id = ids[0];
       couch.insert('scheduledsending',{
         _id:id,
-        id_mail:id_mail,
+        user_id:user_id,
+        mail_id:mail_id,
         date:{
           year:year,
           month:month,
@@ -59,6 +75,7 @@ app.post('/scheduledsending/add', function (req, res){
         }
       }).then(
         function(data, headers, status){
+          res.send('Created successfully');
           res.redirect('/')
         },
         function(err){
@@ -66,51 +83,74 @@ app.post('/scheduledsending/add', function (req, res){
         });
     });
 });
-app.put('/scheduledsending/update/id', function (req, res){
-    const id=req.params.id;
-    const rev = req.body.rev;
-    const id_mail = req.body.id_mail;
-    const year = req.body.date_year;
-    const month = req.body.date_month;
-    const day = req.body.date_day;
-    const hour = req.body.date_hour;
-    const minutes = req.body.date_minutes;
-    couch.update('scheduledsending',{
-        _id:id,
-        _rev:rev,
-        id_mail:id_mail,
-        date:{
-          year:year,
-          month:month,
-          day:day,
-          hour:hour,
-          minutes:minutes
-        }
-      }).then(
-        function(data, headers, status){
-          res.redirect('/')
-        },
-        function(err){
-          res.send(err);
-        });
-
-});
-app.post('scheduledsending/delete/id',function(req,res){
-  const id=req.params.id;
-  const rev = req.body.rev;
-
-  couch.del(dbName, id,rev).then(
+app.put('/scheduledsending/update', function (req, res){
+  couch.get(dbName, viewUrl).then(
     function(data, headers, status){
-      res.redirect('/');
+    var data=data.data.rows;
+    const id = 0;
+    const rev = 0;
+    const user_id = req.body.user_id;
+    const mail_id = req.body.mail_id;
+    const year = req.body.date.year;
+    const month = req.body.date.month;
+    const day = req.body.date.day;
+    const hour = req.body.date.hour;
+    const minutes = req.body.date.minutes;
+    for (i=0;i<data.length;i++){
+      if(user_id==data[i].value.user_id && mail_id==data[i].value.mail_id){
+        //console.log(data[i].);
+        couch.update('scheduledsending',{
+            _id:data[i].id,
+            _rev:data[i].value.rev,
+            user_id:user_id,
+            mail_id:mail_id,
+            date:{
+              year:year,
+              month:month,
+              day:day,
+              hour:hour,
+              minutes:minutes
+            }
+          }).then(
+            function(data, headers, status){
+              res.send('Edited successfully');
+            },
+            function(err){
+              res.send(err);
+            });
+        }
+      }
     },
     function(err){
       res.send(err);
     });
-  });
-
-app.listen(3006, function(){
-  console.log('Server Started On Port 3006');
 });
+
+app.delete('/scheduledsending/delete',function(req,res){
+  couch.get(dbName, viewUrl).then(
+    function(data, headers, status){
+    var dat=data.data.rows;
+    const user_id = req.body.user_id;
+    const mail_id = req.body.mail_id;
+    for (i=0;i<dat.length;i++){
+      if(user_id==dat[i].value.user_id && mail_id==dat[i].value.mail_id){
+        couch.del(dbName,dat[i].id,dat[i].value.rev).then(
+        function(data, headers, status){
+          res.send('Deleted successfully');
+        },
+        function(err){
+          res.send(err);
+        });
+      }
+    }
+  },
+  function(err){
+    res.send(err);
+  });
+});
+
+/*
+
 function intervalFunc() {
   couch.get(dbName, viewUrl).then(
         function(data, headers, status){
@@ -140,3 +180,4 @@ function intervalFunc() {
 
 
 setInterval(intervalFunc, 1500);
+*/
